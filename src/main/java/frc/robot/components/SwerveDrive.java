@@ -141,6 +141,11 @@ public class SwerveDrive implements IControllerMovement
 
 		// Use the right trigger for speed.
 		movementVec = movementVec.scale(this.minMove + (this.maxMove - this.minMove) * rTrigger);
+		
+		// exponential scaling
+		movementVec.scale(movementVec.getLength());
+		movementVec.scale(movementVec.getLength());
+
 
 		// Cap the rotational speed.
 		rightXAxis = this.maxRot * rightXAxis;
@@ -150,6 +155,8 @@ public class SwerveDrive implements IControllerMovement
 		{
 			rightXAxis -= movementVec.getLength() + rightXAxis - 1d;
 		}
+
+		rightXAxis = rightXAxis * rightXAxis * rightXAxis;
 
 		// Move the drivetrain using the calculated values.
 		this.move(movementVec, -rightXAxis);

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 public class Robot extends TimedRobot
 {
 	/** The main drivetrain of the robot. */
-	private static final SwerveDrive DRIVETRAIN = new SwerveDrive(0.3d, 0.8d, 0.5d, 
+	private static final SwerveDrive DRIVETRAIN = new SwerveDrive(0.1d, 1d, 0.5d, 
 		new AHRS(SPI.Port.kMXP),
 		new SwerveModule(2, 1, 11, -3d * Math.PI / 4d, -274.482421875d),
 		new SwerveModule(4, 3, 12, -Math.PI / 4d, -228.33984375d),
