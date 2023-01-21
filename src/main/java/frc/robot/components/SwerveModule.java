@@ -11,6 +11,8 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 import frc.robot.math.Constants;
 import frc.robot.math.Vec2d;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+
 /**
  * Container for one swerve module. Wraps two falcon500s: one for driving and one for steering.
  * 
@@ -21,9 +23,9 @@ public class SwerveModule
 	/** The PID id used to determine what PID settings to use. */
 	private static final int PID_ID = 0;
 	/** The motor controlling the module's movement. */
-	private final WPI_TalonFX drivingMotor;
+	public final WPI_TalonFX drivingMotor;
 	/** The motor controlling the module's rotation. */
-	private final WPI_TalonFX steeringMotor;
+	public final WPI_TalonFX steeringMotor;
 	/** The can coder measuring the module's absolute rotaiton. */
 	private final WPI_CANCoder canCoder;
 	/** The can coder's rotational offset. This value must be manually set through phoenix tuner. */
@@ -52,6 +54,7 @@ public class SwerveModule
 		this.motorRotation = 0;
 
 		this.speedMultiplier = 1;
+	
 	}
 
 	/**
@@ -84,6 +87,7 @@ public class SwerveModule
 		this.canCoder.configMagnetOffset(this.canOffset, Constants.MS_DELAY);
 		this.canCoder.setPositionToAbsolute(Constants.MS_DELAY);
 
+		this.drivingMotor.configMotionAcceleration(Constants.TICK_TO_DEG * 180, Constants.MS_DELAY);
 		// Reset the motor rotations.
 		this.reset();
 	}
@@ -181,7 +185,8 @@ public class SwerveModule
 		}
 
 		// Set the driving motor's speed.
-		this.drivingMotor.set(ControlMode.PercentOutput, vec.getLength() * this.speedMultiplier);
+		// this.drivingMotor.set(ControlMode.PercentOutput, vec.getLength() * this.speedMultiplier);
+		this.drivingMotor.set(ControlMode.Velocity, vec.getLength() * this.speedMultiplier * Constants.TICKS_PER_100MS);
 	}
 
 	/**

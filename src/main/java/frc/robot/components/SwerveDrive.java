@@ -5,11 +5,17 @@ import java.util.Collections;
 import java.util.List;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.math.Constants;
 import frc.robot.math.Vec2d;
 
+import edu.wpi.first.math.controller.PIDController;
+import java.lang.Math;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 /**
  * Container for the robot's swerve drivetrain. Wraps a gyroscope and swerve modules.
  * 
@@ -29,6 +35,8 @@ public class SwerveDrive implements IControllerMovement
 	private final double maxMove;
 	/** The maximum rotational speed of the robot. */
 	private final double maxRot;
+
+	private final PIDController pid;
 	
 	/**
 	 * @param minSpeed minimum movement speed (0 to 1)
@@ -44,6 +52,7 @@ public class SwerveDrive implements IControllerMovement
 		this.maxRot = maxRotation;
 		this.gyro = gyroscope;
 		this.modules = Collections.unmodifiableList(Arrays.asList(swerveModules));
+		this.pid = new PIDController(1,2,3);
 	}
 
 	/**
@@ -177,6 +186,22 @@ public class SwerveDrive implements IControllerMovement
 	{
 		this.gyro.reset();
 	}
+	/**
+	 * Average encoder distance of the drive modules
+	 * @return distance in encoder ticks before gear ratio
+	 */
+	public double averageDist() {
+		int totaldist = 0;
+		for (int i = 0; i <4; i++) {
+			totaldist += this.modules.get(i).drivingMotor.getSelectedSensorPosition();
+		}
+		return totaldist/4;
+	}
+	public void resetDistance(){
+		for (int i = 0; i <4; i++) {
+			this.modules.get(i).drivingMotor.setSelectedSensorPosition(0d);
+		}
+	}
 
 	/**
 	 * Checks if the robot is resetting or if the gyro is callibrating.
@@ -223,4 +248,18 @@ public class SwerveDrive implements IControllerMovement
 		builder.append("]");
 		return builder.toString();
 	}
+
+	public void turnToAngle(double angle) {
+		while ((this.gyro.getAngle() * Constants.DEG_TO_RAD) - angle < Constants.ANGLE_PRECISION) {
+			this.move(new Vec2d(0,0), pid.calculate(this.gyro.getAngle(), angle));
+		}
+	}
+
+	public void moveDistance(Vec2d vec) {
+		for (var i=0; i<4; i++) {
+			this.modules.get(0).drivingMotor.set(ControlMode.MotionMagic, vec.getLength());
+			
+		}
+	}
+
 }

@@ -42,4 +42,12 @@ public class Constants
 
 	/** Multiply an encoder tick value by this to convert it to radians. */
 	public static final double TICK_TO_RAD = 2d * Math.PI / 2048d;
+
+	/** Angle precision for rotation */
+	public static final double ANGLE_PRECISION = Math.PI / 32;
+
+	/** distance precision of auton */
+	public static final double DIST_PRECISION = 1*TICKS_PER_INCH;
+
+	public static final int TICKS_PER_100MS = 21517;
 }
